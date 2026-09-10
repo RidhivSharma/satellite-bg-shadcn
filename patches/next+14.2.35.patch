@@ -1,0 +1,52 @@
+diff --git a/node_modules/next/dist/build/collect-build-traces.js b/node_modules/next/dist/build/collect-build-traces.js
+index 7aedde7..725e83e 100644
+--- a/node_modules/next/dist/build/collect-build-traces.js
++++ b/node_modules/next/dist/build/collect-build-traces.js
+@@ -343,7 +343,7 @@ async function collectBuildTraces({ dir, config, distDir, pageInfos, staticPages
+                     try {
+                         return await _promises.default.readlink(p);
+                     } catch (e) {
+-                        if ((0, _iserror.default)(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN")) {
++                        if ((0, _iserror.default)(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN" || e.code === "EISDIR")) {
+                             return null;
+                         }
+                         throw e;
+diff --git a/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js b/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
+index 043eb2e..0114039 100644
+--- a/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
++++ b/node_modules/next/dist/build/webpack/plugins/next-trace-entrypoints-plugin.js
+@@ -397,7 +397,7 @@ class TraceEntryPointsPlugin {
+                         });
+                     });
+                 } catch (e) {
+-                    if ((0, _iserror.default)(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN")) {
++                    if ((0, _iserror.default)(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN" || e.code === "EISDIR")) {
+                         return null;
+                     }
+                     throw e;
+diff --git a/node_modules/next/dist/esm/build/collect-build-traces.js b/node_modules/next/dist/esm/build/collect-build-traces.js
+index 4852694..61c11d5 100644
+--- a/node_modules/next/dist/esm/build/collect-build-traces.js
++++ b/node_modules/next/dist/esm/build/collect-build-traces.js
+@@ -287,7 +287,7 @@ export async function collectBuildTraces({ dir, config, distDir, pageInfos, stat
+                     try {
+                         return await fs.readlink(p);
+                     } catch (e) {
+-                        if (isError(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN")) {
++                        if (isError(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN" || e.code === "EISDIR")) {
+                             return null;
+                         }
+                         throw e;
+diff --git a/node_modules/next/dist/esm/build/webpack/plugins/next-trace-entrypoints-plugin.js b/node_modules/next/dist/esm/build/webpack/plugins/next-trace-entrypoints-plugin.js
+index 76358da..1e3a3cc 100644
+--- a/node_modules/next/dist/esm/build/webpack/plugins/next-trace-entrypoints-plugin.js
++++ b/node_modules/next/dist/esm/build/webpack/plugins/next-trace-entrypoints-plugin.js
+@@ -366,7 +366,7 @@ export class TraceEntryPointsPlugin {
+                         });
+                     });
+                 } catch (e) {
+-                    if (isError(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN")) {
++                    if (isError(e) && (e.code === "EINVAL" || e.code === "ENOENT" || e.code === "UNKNOWN" || e.code === "EISDIR")) {
+                         return null;
+                     }
+                     throw e;

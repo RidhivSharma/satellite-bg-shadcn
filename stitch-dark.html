@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Orbital Path Visualization</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+</head>
+<body class="bg-[#000000] text-white h-screen w-screen overflow-hidden font-sans relative">
+<!-- BEGIN: BackgroundOrbitalPaths -->
+<!-- This SVG contains lines that will render UNDER the cards (lower z-index) -->
+<svg class="absolute inset-0 w-full h-full z-0 pointer-events-none" data-purpose="background-paths" preserveaspectratio="xMidYMid slice" viewbox="0 0 1920 1080">
+<!-- Path 1: Decorative path -->
+<path class="opacity-75" d="M -100 800 C 400 1100, 1200 900, 2020 300" fill="none" id="bg-path-1" stroke="#FFFFFF" stroke-dasharray="8 8" stroke-width="2"></path>
+<g>
+<animatemotion dur="15s" repeatcount="indefinite">
+<mpath href="#bg-path-1"></mpath>
+</animatemotion>
+<circle fill="#FFFFFF" r="6"></circle>
+<text class="font-mono select-none" fill="#FFFFFF" font-size="10" font-weight="500" letter-spacing="0.1em" opacity="0.5" x="12" y="3.5">LANDSAT-9</text>
+</g>
+<!-- Path 2: Decorative path -->
+<path class="opacity-60" d="M 400 -100 C 700 400, 900 900, 2020 1000" fill="none" id="bg-path-2" stroke="#FFFFFF" stroke-dasharray="10 10" stroke-width="2"></path>
+<g>
+<animatemotion dur="20s" repeatcount="indefinite">
+<mpath href="#bg-path-2"></mpath>
+</animatemotion>
+<circle fill="#FFFFFF" r="5"></circle>
+<text class="font-mono select-none" fill="#FFFFFF" font-size="10" font-weight="500" letter-spacing="0.1em" opacity="0.5" x="12" y="3.5">SENTINEL-6A</text>
+</g>
+<!-- Path 3: The path that crosses UNDER Card B -->
+<!-- It passes through the right side of the screen where Card B will be situated -->
+<path d="M 200 -100 C 800 200, 1400 700, 1600 1180" fill="none" id="bg-path-3" stroke="#FFFFFF" stroke-dasharray="12 12" stroke-width="3"></path>
+<g>
+<animatemotion dur="12s" repeatcount="indefinite">
+<mpath href="#bg-path-3"></mpath>
+</animatemotion>
+<circle fill="#FFFFFF" r="8"></circle>
+<text class="font-mono select-none" fill="#FFFFFF" font-size="10" font-weight="500" letter-spacing="0.1em" opacity="0.5" x="14" y="3.5">NOAA-20</text>
+</g>
+</svg>
+<!-- END: BackgroundOrbitalPaths -->
+<!-- BEGIN: MainContent -->
+<!-- The main container holding the two demo cards, sitting at a middle z-index -->
+<main class="relative z-10 w-full h-full flex flex-col items-center justify-center p-8">
+<header class="absolute top-12 left-12 text-left z-20">
+<h1 class="text-2xl font-bold tracking-wider uppercase mb-2">Orbital Trajectories</h1>
+<p class="text-sm text-gray-400 max-w-md">Demonstrating spatial z-index layering of satellite telemetry paths relative to interface elements.</p>
+</header>
+<section class="flex flex-col md:flex-row gap-12 lg:gap-24 items-center justify-center w-full max-w-5xl">
+<!-- Card A: Referenced (Path will go OVER this card) -->
+<article class="bg-[#000000] border-2 border-[#FFFFFF] rounded-2xl w-72 h-96 p-8 flex flex-col justify-center items-center text-center shadow-2xl relative" data-purpose="referenced-card">
+<div class="w-16 h-16 border border-[#FFFFFF] rounded-full mb-6 flex items-center justify-center">
+<span class="text-xl font-bold">A</span>
+</div>
+<h2 class="text-xl font-semibold mb-3">Card A</h2>
+<p class="text-sm uppercase tracking-widest border-b border-[#FFFFFF] pb-1">Referenced</p>
+<p class="text-xs text-gray-400 mt-6 leading-relaxed">
+          The orbital path intersects this node directly. Telemetry lines are layered in the foreground.
+        </p>
+</article>
+<!-- Card B: Not Referenced (Path goes UNDER this card) -->
+<!-- Added bg-[#000000] explicitly to ensure it occludes the background SVG paths -->
+<article class="bg-[#000000] border-2 border-[#FFFFFF] rounded-2xl w-72 h-96 p-8 flex flex-col justify-center items-center text-center shadow-2xl relative" data-purpose="unreferenced-card">
+<div class="w-16 h-16 border border-gray-600 rounded-full mb-6 flex items-center justify-center text-gray-400">
+<span class="text-xl font-bold">B</span>
+</div>
+<h2 class="text-xl font-semibold mb-3 text-gray-300">Card B</h2>
+<p class="text-sm uppercase tracking-widest text-gray-400 border-b border-gray-600 pb-1">Not Referenced</p>
+<p class="text-xs text-gray-500 mt-6 leading-relaxed">
+          This node acts as an occlusion layer. Telemetry lines pass underneath its surface in the background.
+        </p>
+</article>
+</section>
+</main>
+<!-- END: MainContent -->
+<!-- BEGIN: ForegroundOrbitalPaths -->
+<!-- This SVG contains lines that will render OVER the cards (higher z-index) -->
+<svg class="absolute inset-0 w-full h-full z-30 pointer-events-none" data-purpose="foreground-paths" preserveaspectratio="xMidYMid slice" viewbox="0 0 1920 1080">
+<!-- Path 4: The path that crosses OVER Card A -->
+<!-- It passes through the left side of the screen where Card A is situated -->
+<path d="M -200 900 C 400 1000, 800 300, 2020 50" fill="none" id="fg-path-1" stroke="#FFFFFF" stroke-dasharray="12 12" stroke-width="3"></path>
+<!-- Marker on the foreground path -->
+<g>
+<animatemotion dur="18s" repeatcount="indefinite">
+<mpath href="#fg-path-1"></mpath>
+</animatemotion>
+<circle fill="#FFFFFF" r="8"></circle>
+<circle class="opacity-50" fill="none" r="16" stroke="#FFFFFF" stroke-width="1"></circle>
+<text class="font-mono select-none" fill="#FFFFFF" font-size="11" font-weight="500" letter-spacing="0.1em" opacity="0.55" x="22" y="4">ISS (ZARYA)</text>
+</g>
+</svg>
+<!-- END: ForegroundOrbitalPaths -->
+</body></html>

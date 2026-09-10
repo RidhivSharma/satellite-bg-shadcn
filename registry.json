@@ -1,0 +1,38 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "satellite-bg",
+  "homepage": "https://github.com/RidhivSharma/satellite-bg",
+  "items": [
+    {
+      "name": "satellite-bg",
+      "type": "registry:component",
+      "title": "Satellite Background",
+      "description": "Theme-aware animated satellite background with selective overlay layering.",
+      "dependencies": [
+        "three",
+        "@react-three/fiber",
+        "@react-three/drei",
+        "satellite.js",
+        "next-themes"
+      ],
+      "files": [
+        {
+          "path": "src/components/satellite-bg/satellite-background.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/satellite-bg/procedural-path.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/satellite-bg/use-overlay-clip-path.ts",
+          "type": "registry:component"
+        },
+        {
+          "path": "src/components/satellite-bg/use-satellite-paths.ts",
+          "type": "registry:component"
+        }
+      ]
+    }
+  ]
+}
