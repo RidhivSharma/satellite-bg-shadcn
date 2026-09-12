@@ -1,7 +1,7 @@
-# TLE API Network Timeout Fix
+# TLE Network Timeout Fix
 
 ## Problem
-The `/api/tle` endpoint was failing with connection timeout errors when trying to fetch TLE (Two-Line Element) data from celestrak.org:
+The satellite visibility flow was failing with connection timeout errors when trying to fetch TLE (Two-Line Element) data from celestrak.org:
 
 ```
 ConnectTimeoutError: Connect Timeout Error 
@@ -32,7 +32,7 @@ CelesTrak requests include a descriptive browser-style User-Agent. The route ret
 - HTTP 401, 403, and other non-5xx responses fail fast after one attempt
 
 ### 3. **Fallback Data**
-Created `src/data/fallback-tle.json` with sample TLE data for:
+Created `src/lib/server/fallback-tle.json` with sample TLE data for:
 - ISS (Zarya)
 - Hubble Space Telescope
 - Starlink satellite
@@ -69,7 +69,7 @@ Start the dev server and test:
 npm run dev
 ```
 
-Then visit: `http://localhost:3000/api/tle`
+Then visit: `http://localhost:3000/api/visibility`
 
 ## Network Troubleshooting
 
@@ -94,29 +94,27 @@ If you're behind a corporate firewall or proxy:
 3. **Alternative: Update Fallback Data**
    If you can access celestrak.org from another machine:
    - Download TLE data manually
-   - Update `src/data/fallback-tle.json`
+   - Update `src/lib/server/fallback-tle.json`
    - Commit the updated data
 
 ## API Response
 
-The API preserves the `visual` and `stations` arrays and adds truthful source metadata:
+The `/api/visibility` endpoint returns the observer location, sampled satellite paths, and truthful TLE source metadata:
 
 ```json
 {
-  "visual": [
+  "observer": { "latitude": 40.7, "longitude": -74.0, "source": "geolocation" },
+  "satellites": [
     {
       "name": "ISS (ZARYA)",
-      "line1": "1 25544U ...",
-      "line2": "2 25544 ..."
+      "current": { "timestamp": "<sample time>", "offsetSeconds": 0 },
+      "path": [{ "timestamp": "<sample time>", "offsetSeconds": 0 }]
     }
   ],
-  "stations": [...],
-  "fetchedAt": "<latest data acquisition time>",
-  "source": "live",
-  "groups": {
-    "visual": { "source": "live", "fetchedAt": "<acquisition time>" },
-    "stations": { "source": "live", "fetchedAt": "<acquisition time>" }
-  }
+  "calculatedAt": "<calculation time>",
+  "tleSource": "live",
+  "tleFetchedAt": "<latest data acquisition time>",
+  "syntheticFallback": false
 }
 ```
 

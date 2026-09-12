@@ -1,7 +1,7 @@
 # Ambient Satellite Background — Build Plan
 
 A theme-aware, always-on ambient background for the portfolio site showing 3–5
-real satellites currently overhead, rendered in Three.js, distributed as an
+real satellites currently overhead, rendered with SVG, distributed as an
 installable shadcn registry component.
 
 ---
@@ -41,7 +41,7 @@ installable shadcn registry component.
 | Layer | Choice | Why |
 |---|---|---|
 | Framework | Next.js 14 (already your portfolio stack) | App Router + Route Handlers double as your TLE-fetch/cache layer |
-| 3D | Three.js via `@react-three/fiber` + `@react-three/drei` | Standard R3F/Next combo |
+| Rendering | SVG paths, circles, and CSS layering | Lightweight browser-native rendering |
 | Orbital math | `satellite.js` | Maintained SGP4/SDP4 propagation, TLE parsing, ECI→look-angle conversion |
 | Data source | CelesTrak TLE sets (free, no key) | Reliable, updated every few hours, no auth |
 | Geolocation | IP geolocation (server-side, cached), with a fixed fallback location | Silent, no permission prompt — fits a "background just works" component |
@@ -56,8 +56,7 @@ installable shadcn registry component.
 ### Phase 0 — Repo scaffolding
 - New package/folder for the component, developed independently, later
   installed into the portfolio repo via shadcn.
-- Init TypeScript, Tailwind, and the R3F deps (`three`, `@react-three/fiber`,
-  `@react-three/drei`, `satellite.js`).
+- Init TypeScript, Tailwind, and the orbital-data dependency (`satellite.js`).
 
 ### Phase 1 — Visual reference pass (Stitch)
 Stitch generates UI screens, not WebGL — its only job here is a visual
@@ -94,7 +93,7 @@ in both light and dark mode.
   not a snapping dot.
 
 ### Phase 5 — Rendering: dashed path + live marker
-- Render each satellite's sampled path as a dotted/dashed curved line, and
+- Render each satellite's procedural path as a dotted/dashed SVG curve, and
   the live marker as a small point traveling along it in real time —
   colored via the current theme (white on black in dark mode, black on
   white in light mode), no other colors.
@@ -124,8 +123,7 @@ in both light and dark mode.
 
 ### Phase 7 — Package as a shadcn registry component
 - Author a `registry.json` following shadcn's registry schema: name,
-  `registry:component` type, file list, and `dependencies` (`three`,
-  `@react-three/fiber`, `@react-three/drei`, `satellite.js`).
+  `registry:component` type, file list, and `dependencies` (`satellite.js`).
 - Host it somewhere reachable so it's installable via
   `npx shadcn add <your-url>/satellite-bg.json`.
 
@@ -143,9 +141,8 @@ in both light and dark mode.
 
 ## 3. Skills/knowledge checklist
 
-- **Three.js + React Three Fiber basics** — scenes, materials, `useFrame`
-  for per-frame updates, drawing curved lines (`@react-three/drei`'s Line
-  helper or a custom curve).
+- **SVG path and animation basics** — drawing curved paths, positioning
+  markers, and synchronizing animation with the browser frame loop.
 - **Orbital mechanics vocabulary, not the math itself** — TLE, azimuth,
   elevation, range, and what `satellite.js`'s functions expect/return.
 - **Next.js Route Handlers + caching/revalidation** — TLE fetch endpoint
