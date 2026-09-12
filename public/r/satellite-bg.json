@@ -7,7 +7,7 @@
     "next-themes"
   ],
   "registryDependencies": [
-    "satellite-bg-backend"
+    "RidhivSharma/satellite-bg-shadcn/satellite-bg-backend"
   ],
   "files": [
     {

@@ -9,7 +9,7 @@
       "title": "Satellite Background",
       "description": "Theme-aware animated satellite background with procedural SVG paths and selective overlay layering.",
       "dependencies": ["next-themes"],
-      "registryDependencies": ["satellite-bg-backend"],
+      "registryDependencies": ["RidhivSharma/satellite-bg-shadcn/satellite-bg-backend"],
       "files": [
         {
           "path": "registry/satellite-bg/components/satellite-bg/satellite-background.tsx",
