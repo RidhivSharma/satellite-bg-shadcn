@@ -10,8 +10,8 @@
  *  - The live renderer: real TLE-derived visibility data picks *which*
  *    satellites are shown and *how long* each stays on screen, but the
  *    on-screen curve shape itself comes from here.
- *  - The offline/no-data fallback (PLAN.md Phase 6, not built yet): can
- *    call this with synthetic seeds (e.g. "FALLBACK-1") and get the same
+ *  - The offline/no-data fallback can call this with synthetic seeds (e.g.
+ *    "FALLBACK-1") and get the same
  *    visually-equivalent full-screen, non-coinciding curves with zero
  *    dependency on live data.
  *

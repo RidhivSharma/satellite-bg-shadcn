@@ -1,29 +1,39 @@
 # Satellite Background
 
-A reusable shadcn registry component that renders an animated, theme-aware satellite background with procedural SVG paths and optional overlay clipping.
+A reusable shadcn registry component for an animated, theme-aware satellite background. It renders monochrome procedural SVG paths, moving markers, and optional clipped overlays while the installed backend computes visibility from satellite TLE data.
+
+This repository contains the registry source and generated registry responses. It is not the consumer application; installing `satellite-bg` adds the frontend component and its backend registry dependency to an existing Next.js app.
 
 ## Installation
 
-Phase 1 prepares the registry source. The eventual installation command is conceptually:
+From a Next.js App Router project configured for shadcn/ui, run:
 
 ```bash
 npx shadcn@latest add RidhivSharma/satellite-bg-shadcn/satellite-bg
 ```
 
-This command has not been validated against a fresh consumer project yet; that is Phase 2.
+The installation adds the frontend component and automatically resolves:
 
-## Requirements
+```text
+satellite-bg
+└── RidhivSharma/satellite-bg-shadcn/satellite-bg-backend
+```
 
-- Next.js 14 or newer with the App Router
-- TypeScript
-- A Node-compatible runtime for the visibility API route
-- React and ReactDOM supplied by the consumer application
-- `next-themes`
-- `satellite.js`
+The backend item installs:
 
-Installing `satellite-bg` declares the backend registry item automatically. The backend installs the `/api/visibility` route and its server-side TLE and geolocation utilities.
+- `app/api/visibility/route.ts`
+- `lib/server/tle.ts`
+- `lib/server/geolocation.ts`
+- `lib/server/fallback-tle.json`
 
-## Usage
+The frontend item installs:
+
+- `components/satellite-bg/satellite-background.tsx`
+- `components/satellite-bg/procedural-path.ts`
+- `components/satellite-bg/use-satellite-paths.ts`
+- `components/satellite-bg/use-overlay-clip-path.ts`
+
+## Basic usage
 
 ```tsx
 import { SatelliteBackground } from "@/components/satellite-bg/satellite-background";
@@ -33,31 +43,100 @@ export default function Page() {
 }
 ```
 
-To render a synchronized clipped layer over selected elements, pass their DOM IDs:
+The component has one optional prop:
 
-```tsx
-<SatelliteBackground overlayIds={["hero-card", "primary-panel"]} />
+```ts
+type SatelliteBackgroundProps = {
+  overlayIds?: string[];
+};
 ```
 
-The component uses the fixed `/api/visibility` endpoint. The backend also supports optional `lat` and `lon` query parameters for explicit observer coordinates.
+`overlayIds` defaults to an empty list. When it contains DOM element IDs, the component renders a synchronized clipped foreground layer over those elements. Without it, the background remains in the lowest fixed layer. The component has no other public props.
 
-## Theme
+## Theme provider
 
-The component uses `useTheme()` from `next-themes`. Mount a `next-themes` `ThemeProvider` in the consumer application for actual light/dark switching. The component still renders without a provider, using its existing dark styling until a resolved theme is available.
+The component calls `useTheme()` from `next-themes`. Configure the consumer application with its own `ThemeProvider`; do not install or copy an application-level provider from this repository.
 
-## Environment variables
+```tsx
+"use client";
 
-No environment variables are required for basic use.
+import { ThemeProvider } from "next-themes";
 
-- `TLE_MOCK_MODE=true` forces the bundled fallback TLE data and avoids live CelesTrak requests.
-- `IP_GEOLOCATION_URL` overrides the default provider, `https://ipwho.is/{ip}`. Keep `{ip}` in the URL where the client IP should be inserted.
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+      {children}
+    </ThemeProvider>
+  );
+}
+```
+
+The component renders a black background with white graphics in dark mode and a white background with black graphics in light mode. A provider is required for proper theme-aware rendering and switching.
+
+## Requirements
+
+- Next.js App Router with a server/API route runtime.
+- React and TypeScript supplied by the consumer application.
+- `next-themes` for the theme provider. It is declared by the frontend registry item.
+- A Node-compatible runtime for the backend route and server utilities.
+- `satellite.js` for server-side orbit propagation. It is declared by the backend registry item.
+
+Phase 2 was tested with Next.js `16.3.5` and React `19.2.8`. These are tested versions, not universal minimum-version claims.
+
+Static export is not supported: `output: "export"` cannot serve the required `/api/visibility` route.
+
+## Visibility API
+
+The backend exposes:
+
+```text
+GET /api/visibility
+```
+
+The frontend calls this endpoint automatically. It returns the observer location, up to three visible satellites, sampled paths, calculation metadata, and TLE source metadata.
+
+Optional explicit coordinates can be supplied for testing or an externally resolved observer:
+
+```text
+GET /api/visibility?lat=37.7749&lon=-122.4194
+```
+
+`lat` and `lon` must be supplied together. Latitude must be between `-90` and `90`; longitude must be between `-180` and `180`. Invalid or incomplete coordinates return HTTP `400`.
+
+The route selects satellites above a 15-degree elevation threshold, limits the response to three satellites, and samples each selected path at eleven one-minute offsets from the current time through ten minutes ahead. If no computed satellite passes the threshold, it returns three synthetic paths and sets `syntheticFallback` to `true`.
+
+## TLE data
+
+The backend requests visual and space-station TLE groups from CelesTrak. Each group is cached in process memory for four hours. When a refresh fails, the backend uses an available stale live cache; if none exists, it uses the bundled fallback TLE file. `tleSource` reports `live`, `stale`, `fallback`, `mock`, or `mixed` so fallback behavior is visible to consumers.
+
+For deterministic offline testing, set this server-side environment variable and restart the application:
+
+```text
+TLE_MOCK_MODE=true
+```
+
+Mock mode uses the bundled TLE records and reports `tleSource: "mock"`. No `.env` file is required or included by this repository.
+
+## Geolocation
+
+Without coordinate overrides, the backend reads the first address from `x-forwarded-for` or `x-real-ip` when it is a valid public IP. It queries `https://ipwho.is/{ip}` by default and caches successful results in process memory for one hour.
+
+Set `IP_GEOLOCATION_URL` to use another provider URL. Keep `{ip}` in the value where the encoded client IP should be inserted:
+
+```text
+IP_GEOLOCATION_URL=https://example.com/lookup/{ip}
+```
+
+Invalid, private, loopback, missing, timed-out, failed, or unusable geolocation data falls back to San Francisco coordinates (`37.7749, -122.4194`). This is why localhost development uses the fallback location unless explicit `lat` and `lon` values are provided.
 
 ## Limitations
 
-- App Router is required.
-- `output: "export"` is not supported because the feature requires an API route.
-- The visibility route requires a Node-compatible server deployment.
-- Localhost development falls back to San Francisco because localhost and loopback addresses are not publicly geolocatable.
-- Production IP geolocation depends on correctly forwarded proxy headers.
-- CelesTrak and ipwho.is are external services.
-- Bundled TLE data is a fallback and can become stale.
+- The backend requires a Node-compatible server runtime; static export is incompatible.
+- Production geolocation depends on the deployment proxy forwarding a public client IP.
+- CelesTrak and the default ipwho.is provider are external services. Network or provider failures use the documented stale, bundled, or coordinate fallbacks.
+- Bundled TLE records are intentionally a fallback and can become stale.
+- The registry package does not include demo pages, layout files, theme controls, fonts, screenshots, unrelated UI components, or application configuration.
+
+## Repository development
+
+The public distribution is defined by `registry.json`, the files under `registry/`, and the generated JSON responses under `public/r/`. The `src/` tree is a local test harness used to validate the same component and backend behavior; it is not installed by the registry.

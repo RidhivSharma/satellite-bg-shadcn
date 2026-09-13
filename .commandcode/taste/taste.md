@@ -1,2 +1,4 @@
-# Taste
-See [taste/taste.md](taste/taste.md)
+- Prefers strictly scoped repository work: modify only the specified current repository, leave unrelated projects and files untouched, and avoid commits or pushes unless explicitly requested. Confidence: 0.98
+- Prefers inspecting and verifying dependency usage before deleting metadata or files, followed by narrowly targeted removal rather than broad cleanup. Confidence: 0.97
+- Expects validation after changes, including type checks, configuration/registry validation, artifact existence checks, and searches for remaining references. Confidence: 0.96
+- Prefers concise, structured completion reports with explicit pass/fail results, a list of removed items, change-scope confirmation, and remaining references. Confidence: 0.95

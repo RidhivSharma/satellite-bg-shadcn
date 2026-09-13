@@ -1,2 +1,0 @@
-npm warn exec The following package was not found and will be installed: create-next-app@14.2.35
-[?25l[2K[1G[36m?[39m [1mWould you like to use [34mTypeScript[39m?[22m [90m»[39m No [90m/[39m [36m[4mYes[39m[24m
